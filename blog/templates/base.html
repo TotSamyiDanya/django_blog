@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Блог на Django</title>
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous">
+    </script>
+    <style>
+        * {
+            font-family: "Montserrat", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-style: normal;
+        }
+        body {
+            overflow: -moz-scrollbars-none;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .sticky-row {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+        .row {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+        .row.scrollable {
+            overflow: auto;
+        }
+        .col {
+            flex: 1;
+            align-items: center;
+        }
+        .col-15 {
+            flex: 15;
+        }
+        .col-20 {
+            flex: 20;
+        }
+        .col-25 {
+            flex: 25;
+        }
+        .col-30 {
+            flex: 30;
+        }
+        .col-60 {
+            flex: 60;
+        }
+        .input-blog {
+            padding-top: 0.65rem;
+            padding-bottom: 0.65rem;
+            font-size: 17px;
+            resize: none;
+        }
+        .brand-blog {
+            font-size: 24px;
+        }
+        .comments-blog {
+            font-size: 20px;
+        }
+        .button-blog {
+            font-size: 17px;
+        }
+        .post-info {
+            font-size: 15px;
+        }
+        .post-title {
+            color: #dee2e6;
+            font-weight: 700;
+            font-size:24px;
+        }
+        .avatar-blog {
+            width: 30px;
+            height: 30px;
+        }
+        .form-button-blog {
+            width: 100%;
+            font-size: 17px;
+        }
+        a {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #dee2e6;
+        }
+        a:hover {
+            color: #dee2e6;
+        }
+        a:active {
+            color: #dee2e6;
+        }
+        .custom-input:focus {
+            border-color: #dee2e6 !important;
+            box-shadow: 0 0 0 0.1px #dee2e6 !important;
+        }
+        .custom-input:hover {
+            border-color: #dee2e6 !important;
+            box-shadow: 0 0 0 0.1px #dee2e6 !important;
+        }
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration {
+            -webkit-appearance:none;
+        }
+        .span-container {
+            display: flex;
+        }
+        .span-container span {
+            white-space: nowrap;
+        }
+        .icon-button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .highlight-effect {
+            color: #007bff;
+            transition: all 0.3s;
+        }
+        .highlight-effect::before {
+            border-radius: 10px;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: gray;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .highlight-effect:hover::before {
+            opacity: 0.05;
+        }
+        .highlight-effect:hover {
+            color: #fff;
+        }
+        .custom-input:focus {
+            border-color: #dee2e6 !important;
+            box-shadow: 0 0 0 0.1px #dee2e6 !important;
+        }
+        .modal {
+            z-index: 10000;
+        }
+        .modal-title-blog {
+            font-size: 24px;
+        }
+        .post-link {
+            text-decoration: none;
+        }
+        .comment-info {
+            font-size: 15px;
+            line-height: 1px;
+        }
+        .save-button {
+            font-size:17px;
+            width: 150px;
+            margin-right: 30px;
+        }
+        .nav-button {
+            font-size:17px;
+            width: 50px;
+        }
+        .delete-button {
+            font-size:17px;
+            width: 150px;
+            margin-right: 10px;
+        }
+        .dropdown-item:active {
+            background: #2b3035;
+        }
+        .form-check-input:checked {
+            background-color: #212529;
+            border-color: #dee2e6;
+        }
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+        }
+    </style>
+</head>
+<body>
+{% if request.COOKIES.name %}
+{% else %}
+<div id="exampleModalToggle" class="modal fade"
+     aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-body-tertiary">
+                <h1 id="exampleModalToggleLabel" class="modal-title modal-title-blog">Вход</h1>
+                <button class="btn-close"
+                        type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-body-tertiary">
+                <form class="col"
+                      method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-9">
+                            {{ login_form.name }}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-9">
+                            {{ login_form.password }}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-4 mb-4">
+                        <div class="col-md-9">
+                            <button class="btn btn-dark form-button-blog"
+                                    type="submit">Войти</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row justify-content-center mt-4 mb-4">
+                    <div class="col-md-9 text-center">
+                        <span class="me-0">Нет аккаунта?</span>
+                        <a class="link"
+                           data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">Зарегистрироваться</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="exampleModalToggle2" class="modal fade"
+     aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-body-tertiary">
+                <h1 id="exampleModalToggleLabel2" class="modal-title modal-title-blog">Регистрация</h1>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-body-tertiary">
+                <form class="col"
+                      method="post" action="{% url 'register' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-9">
+                            {{ register_form.name }}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-9">
+                            {{ register_form.password }}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-9">
+                            <label class="form-label"
+                                   for="{{ register_form.avatar.id_for_label }}">Аватар пользователя:</label>
+                            {{ register_form.avatar }}
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-4 mb-4">
+                        <div class="col-md-9">
+                            <button class="btn btn-dark form-button-blog"
+                                    type="submit">Зарегистрироваться</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row justify-content-center mt-4 mb-4">
+                    <div class="col-md-9 text-center">
+                        <span>Есть аккаунт?</span>
+                        <a class="link"
+                           data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="row sticky-row bg-body-tertiary">
+    <div class="col col-20 text-center">
+    </div>
+    <div class="col col-25 mt-2 pt-2 ">
+        <a class="navbar-brand brand-blog ms-2 ps-1"
+           href="{% url 'home' %}">Блог на Django</a>
+    </div>
+    <div class="col col-60 text-center px-0 pt-1 pb-1">
+        <form id="search-form" class="d-flex align-items-md-stretch"
+              method="get" action="{% url 'home' %}">
+            <input id="search-input" class="form-control mt-2 mb-2 custom-input input-blog"
+                   placeholder="Поиск" name="query" autocomplete="off">
+      </form>
+    </div>
+    <div class="col col-25 d-flex align-items-center">
+        {% if request.COOKIES.name %}
+        <a id="dropdownMenuButton" class="btn btn-dark row fs-6 dropdown-toggle ms-3"
+           href="#" data-bs-toggle="dropdown" aria-expanded="false" style="align-items: center;">
+            <div class="col col-15 px-0">
+                <img class="rounded-circle pt-0 pb-0 avatar-blog"
+                     src="{{ user.avatar.url }}">
+            </div>
+            <div class="col col-60">
+                <span class="text-truncate">{{ user.name }}</span>
+            </div>
+        </a>
+        <ul class="dropdown-menu"
+            aria-labelledby="dropdownMenuButton">
+            <li>
+                <a class="dropdown-item"
+                   href="{% url 'editor' %}">Добавить новый пост</a>
+            </li>
+            <li>
+                <a class="dropdown-item"
+                   href="{% url 'personal' %}">Список постов</a>
+            </li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li>
+                <a class="dropdown-item"
+                   href="{% url 'logout' %}">Выйти</a>
+            </li>
+        </ul>
+        {% else %}
+        <button id="auth" class="btn btn-dark ms-3 button-blog"
+                data-bs-toggle="modal" data-bs-target="#exampleModalToggle" type="button">Войти</button>
+        {% endif %}
+    </div>
+    <div class="col col-20">
+    </div>
+</div>
+<div class="row">
+    <div class="col col-20 text-center">
+    </div>
+    <div class="col col-25 mt-2 pt-1">
+        {% if request.COOKIES.name and not hide_menu %}
+        <a class="btn btn-dark btn-lg d-block button-blog d-flex align-items-center justify-content-start ps-2 mb-2"
+           href="{% url 'poll' %}" type="button">
+            <svg class="me-2"
+                 xmlns="http://www.w3.org/2000/svg"
+                 height="27" width="27"
+                 viewBox="0 -960 960 960" fill="#dee2e6">
+                <path d="m438-426 198-198-57-57-141 141-56-56-57 57 113
+                113Zm42 240q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0
+                71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0
+                223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z"/>
+            </svg>
+            Пройти опрос
+        </a>
+        <a class="btn btn-dark btn-lg d-block button-blog d-flex justify-content-start ps-2"
+           type="button">
+            <svg class="ms-0 me-2"
+                 xmlns="http://www.w3.org/2000/svg"
+                 height="27" width="27"
+                 viewBox="0 -960 960 960" fill="#dee2e6">
+                <path d="M560-360q17 0 29.5-12.5T602-402q0-17-12.5-29.5T560-444q-17 0-29.5 12.5T518-402q0
+                17 12.5 29.5T560-360Zm-30-128h60q0-29 6-42.5t28-35.5q30-30 40-48.5t10-43.5q0-45-31.5-73.5T560-760q-41
+                0-71.5 23T446-676l54 22q9-25 24.5-37.5T560-704q24 0 39 13.5t15 36.5q0 14-8 26.5T578-596q-33 29-40.5
+                45.5T530-488ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5
+                23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33
+                0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z"/>
+            </svg>
+            Пройти викторину
+        </a>
+        {% else %}
+        {% endif %}
+    </div>
+    <div class="col col-60 px-0">
+        {% block content %}{% endblock %}
+    </div>
+    <div class="col col-25">
+    </div>
+    <div class="col col-20">
+    </div>
+</div>
+<script>
+    const myModal = document.getElementById('myModal');
+    const myInput = document.getElementById('myInput');
+    document.getElementById('search-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('search-form').submit();
+        }
+    });
+    myModal.addEventListener('shown.bs.modal', () => {
+        myInput.focus();
+    })
+</script>
+</body>
+</html>

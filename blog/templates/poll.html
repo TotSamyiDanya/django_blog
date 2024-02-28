@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}Голосование{% endblock %}
+
+{% block content %}
+<h4 id="results" class="button-brand mt-3 mb-4" style="display: none;">Результаты опроса</h4>
+{% if not completed %}
+{% for question in questions %}
+{% if forloop.first %}
+<div class="card mt-3 mb-3 px-2 pb-0 border-0 bg-body-tertiary question" style="display: block;">
+    <div class="card-body bg-body-tertiary">
+        <h4 class="button-brand mt-3 mb-4">{{ question.text }}</h4>
+        {% for key, value in choices.items %}
+        {% if key == question.id %}
+        {% for choice in value %}
+        <a class="card px-3 py-3 mb-3 btn btn-dark choice"
+           style="display: flex;" data-choice-id="{{ choice.id }}" data-question-id="{{ question.id }}">
+            <div class="form-check d-flex align-items-top" style="flex: 1;">
+                <input name="choice_{{ choice.id }}" id="exampleRadio2" class="form-check-input button-blog"
+                       type="radio">
+                <p class="form-check-label button-blog ms-3 mb-0"
+                       for="exampleRadio2">{{ choice.text }}</p>
+                <div style="flex: 1; display: flex; justify-content: flex-end; align-items: center;">
+                <span id="percent_choice_{{ choice.id }}" class="percent" style="display: none;">75%</span>
+                </div>
+            </div>
+            <div id="progress_div_choice_{{ choice.id }}" class="progress mt-2" style="display: none;">
+                <div id="progress_choice_{{ choice.id }}" class="progress-bar bg-light"
+                     role="progressbar" style="width: 75%; opacity: 0.2;" aria-valuenow="75" aria-valuemin="0"
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+        <div class="d-flex justify-content-center mt-4 mb-2">
+            <button class="btn btn-dark button-blog py-2 px-4">Следующий вопрос</button>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card mt-3 mb-3 px-2 pb-0 border-0 bg-body-tertiary question" style="display: none;">
+    <div class="card-body bg-body-tertiary">
+        <h4 class="button-brand mt-3 mb-4">{{ question.text }}</h4>
+        {% for key, value in choices.items %}
+        {% if key == question.id %}
+        {% for choice in value %}
+        <a class="card px-3 py-3 mb-3 btn btn-dark choice"
+           style="display: flex;" data-choice-id="{{ choice.id }}" data-question-id="{{ question.id }}">
+            <div class="form-check d-flex align-items-top" style="flex: 1;">
+                <input name="choice_{{ choice.id }}" id="exampleRadio2" class="form-check-input button-blog"
+                       type="radio">
+                <p class="form-check-label button-blog ms-3 mb-0"
+                       for="exampleRadio2">{{ choice.text }}</p>
+                <div style="flex: 1; display: flex; justify-content: flex-end; align-items: center;">
+                <span id="percent_choice_{{ choice.id }}" class="percent" style="display: none;">75%</span>
+                </div>
+            </div>
+            <div id="progress_div_choice_{{ choice.id }}" class="progress mt-2" style="display: none;">
+                <div id="progress_choice_{{ choice.id }}" class="progress-bar bg-light"
+                     role="progressbar" style="width: 75%; opacity: 0.2;" aria-valuenow="75" aria-valuemin="0"
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+        <div class="d-flex justify-content-center mt-4 mb-2">
+            <button class="btn btn-dark button-blog py-2 px-4"
+                    type="submit">Следующий вопрос</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% else %}
+<h4 id="results" class="button-brand mt-3 mb-4">Результаты опроса</h4>
+{% for question in questions %}
+<div class="card mt-3 mb-3 px-2 pb-0 border-0 bg-body-tertiary question" style="display: block;">
+    <div class="card-body bg-body-tertiary">
+        <h4 class="button-brand mt-3 mb-4">{{ question.text }}</h4>
+        {% for key, value in choices.items %}
+        {% if key == question.id %}
+        {% for choice in value %}
+        <a id="btn_choice_{{ choice.id }}" class="card px-3 py-3 mb-3 btn btn-dark choice disabled"
+           style="display: flex;" data-choice-id="{{ choice.id }}" data-question-id="{{ question.id }}">
+            <div class="form-check d-flex align-items-top" style="flex: 1;">
+                <input name="choice_{{ choice.id }}" id="exampleRadio2" class="form-check-input button-blog"
+                       type="radio">
+                <p class="form-check-label button-blog ms-3 mb-0"
+                       for="exampleRadio2">{{ choice.text }}</p>
+                <div style="flex: 1; display: flex; justify-content: flex-end; align-items: center;">
+                <span id="percent_choice_{{ choice.id }}" class="percent">75%</span>
+                </div>
+            </div>
+            <div id="progress_div_choice_{{ choice.id }}" class="progress mt-2">
+                <div id="progress_choice_{{ choice.id }}" class="progress-bar bg-light"
+                     role="progressbar" style="width: 75%; opacity: 0.2;" aria-valuenow="75" aria-valuemin="0"
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+<script>
+    var completed = {{ user_votes|escapejs }};
+    var pollId = {{ poll_id|escapejs }};
+    var choices = document.querySelectorAll('a.choice');
+    var selectedChoice = null;
+    var questions = document.querySelectorAll('.question');
+    var currentQuestionIndex = 0;
+    var buttons = document.querySelectorAll('button.button-blog');
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    var userName = getCookie('name');
+
+    choices.forEach(function(choice) {
+        choice.addEventListener('click', function() {
+            var choiceId = choice.getAttribute('data-choice-id');
+            var questionId = choice.getAttribute('data-question-id');
+            $.ajax({
+                url: "{% url 'poll' %}",
+                method: 'POST',
+                data: { choice_id: choiceId, question_id: questionId, user_name: userName },
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+                success: function(response) {
+                    var parsedResponse = JSON.parse(response);
+                    for (var key in parsedResponse) {
+                        var value = parsedResponse[key];
+                        var progressDiv = document.getElementById(`progress_div_choice_${key}`);
+                        var progress = document.getElementById(`progress_choice_${key}`);
+
+                        if (progressDiv && progress) {
+                            progress.style.width = `${value}%`;
+                            document.getElementById(`percent_choice_${key}`).textContent = `${value}%`;
+                        }
+                    }
+
+                    var choices_curr = questions[currentQuestionIndex].querySelectorAll('a.choice');
+                    choices_curr.forEach(function(choice) {
+                        var progressDiv = choice.querySelector('div.progress');
+                        if (progressDiv) {
+                            progressDiv.style.display = 'flex';
+                        }
+
+                        var percentElement = choice.querySelector('.percent');
+                        if (percentElement) {
+                            percentElement.style.display = 'block';
+                        }
+                        choice.classList.add('disabled');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    button = document.getElementById('auth');
+                    button.click();
+                }
+            });
+            if (selectedChoice !== null) {
+                unselectChoice(selectedChoice);
+            }
+            selectChoice(choice);
+            selectedChoice = null;
+        });
+    });
+
+    function unselectChoice(choice) {
+        var progressElement = choice.querySelector('.progress-bar');
+        progressElement.style.width = '30%';
+        progressElement.style.opacity = '0.2';
+        var radioInput = choice.querySelector('.form-check-input');
+        radioInput.checked = false;
+    }
+
+    function selectChoice(choice) {
+        var progressElement = choice.querySelector('.progress-bar');
+        progressElement.style.width = '30%';
+        progressElement.style.opacity = '0.8';
+        var radioInput = choice.querySelector('.form-check-input');
+        radioInput.checked = true;
+        selectedChoice = choice;
+    }
+
+    function showNextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            questions[currentQuestionIndex].style.display = 'none';
+            currentQuestionIndex++;
+            questions[currentQuestionIndex].style.display = 'block';
+        }
+        else {
+            showPollResults();
+        }
+    }
+
+    function showQuestionResults(choice) {
+        var progressDiv = choice.querySelector('div.progress');
+        progressDiv.style.display = 'flex';
+        var percentElement = choice.querySelector('.percent');
+        percentElement.style.display = 'block';
+    }
+
+    function showPollResults() {
+        questions.forEach(function(question) {
+            question.style.display = 'block';
+        });
+        buttons.forEach(function(element) {
+            element.style.display = 'none';
+        });
+        results.style.display = 'block';
+        $.ajax({
+            url: "{% url 'complete' %}",
+            method: 'POST',
+            data: { poll_id: pollId, user_name: userName },
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            success: function(response) {
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }
+
+    buttons.forEach(function(element) {
+        element.addEventListener('click', function() {
+            showNextQuestion();
+        });
+    });
+
+    for (var key in completed) {
+        if (completed.hasOwnProperty(key)) {
+            var btn = document.getElementById(`btn_choice_${completed[key]}`);
+            btn.click();
+        }
+    }
+</script>
+{% endblock %}

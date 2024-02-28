@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ data.title }}{% endblock %}
+
+{% block content %}
+
+<div class="card mt-3 mb-3 px-2 pb-0 border-0 bg-body-tertiary">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col ps-2 pe-1">
+                <img class="rounded-circle"
+                     width="45px" height="45px" src="{{ post.user.avatar.url }}">
+            </div>
+            <div class="col col-60">
+                <div class="row mt-0 mb-0">
+                    <span class="text-body button-blog">{{ post.user.name }}</span>
+                </div>
+                <div class="span-container">
+                    <span class="me-1 text-body post-info">{{ post.topic }}</span>
+                    <span class="ms-1 text-body-secondary post-info">{{ post.date }}</span>
+                </div>
+            </div>
+        </div>
+        <h5 class="card-title mb-3 post-title">{{ post.title }}</h5>
+        <h6 class="card-subtitle mb-3 text-body button-blog">{{ post.subtitle }}</h6>
+        {% for paragraph in paragraphs %}
+        <p class="card-text text-body button-blog">{{ paragraph }}</p>
+        {% endfor %}
+        <img class="card-img-top rounded mb-3"
+             src="{{ post.cover.url }}">
+         <div class="span-container mb-0 pb-0">
+            {% if like is not None %}
+            <button id="like_button_{{ post.id }}" class="btn btn-dark icon-button ps-1 pe-3 pt-2 like_button"
+                    name="like_button" type="submit" data-post-id="{{ post.id }}" style="z-index: 500;">
+                <svg width="40px" height="40px" viewBox="0 0 24 24" fill="#dee2e6" xmlns="http://www.w3.org/2000/svg">
+                    <path id="like_icon_{{ post.id }}"
+                          d="M19.3 5.71002C18.841 5.24601 18.2943 4.87797 17.6917 4.62731C17.0891 4.37666 16.4426
+                          4.2484 15.79 4.25002C15.1373 4.2484 14.4909 4.37666 13.8883 4.62731C13.2857 4.87797 12.739
+                          5.24601 12.28 5.71002L12 6.00002L11.72 5.72001C10.7917 4.79182 9.53273 4.27037 8.22
+                          4.27037C6.90726 4.27037 5.64829 4.79182 4.72 5.72001C3.80386 6.65466 3.29071 7.91125 3.29071
+                          9.22002C3.29071 10.5288 3.80386 11.7854 4.72 12.72L11.49 19.51C11.6306 19.6505 11.8212
+                          19.7294 12.02 19.7294C12.2187 19.7294 12.4094 19.6505 12.55 19.51L19.32 12.72C20.2365
+                          11.7823 20.7479 10.5221 20.7442 9.21092C20.7405 7.89973 20.2218 6.64248 19.3 5.71002Z"
+                          fill="#e9445a" />
+                </svg>
+                <span id="like_count_{{ post.id }}" class="ms-2"
+                      style="font-size:16px; color: #e9445a;">{{ post.likes }}</span>
+            </button>
+            {% else %}
+            <button id="like_button_{{ post.id }}" class="btn btn-dark icon-button ps-1 pe-3 pt-2 like_button"
+                    name="like_button" type="submit" data-post-id="{{ post.id }}" style="z-index: 500;">
+                <svg width="40px" height="40px" viewBox="0 0 24 24" fill="#dee2e6" xmlns="http://www.w3.org/2000/svg">
+                    <path id="like_icon_{{ post.id }}"
+                          d="M19.3 5.71002C18.841 5.24601 18.2943 4.87797 17.6917 4.62731C17.0891 4.37666 16.4426
+                          4.2484 15.79 4.25002C15.1373 4.2484 14.4909 4.37666 13.8883 4.62731C13.2857 4.87797 12.739
+                          5.24601 12.28 5.71002L12 6.00002L11.72 5.72001C10.7917 4.79182 9.53273 4.27037 8.22
+                          4.27037C6.90726 4.27037 5.64829 4.79182 4.72 5.72001C3.80386 6.65466 3.29071 7.91125 3.29071
+                          9.22002C3.29071 10.5288 3.80386 11.7854 4.72 12.72L11.49 19.51C11.6306 19.6505 11.8212
+                          19.7294 12.02 19.7294C12.2187 19.7294 12.4094 19.6505 12.55 19.51L19.32 12.72C20.2365
+                          11.7823 20.7479 10.5221 20.7442 9.21092C20.7405 7.89973 20.2218 6.64248 19.3 5.71002Z"
+                          fill="#dee2e6" />
+                </svg>
+                <span class="ms-2" style="font-size:16px; color: #dee2e6;"
+                      id="like_count_{{ post.id }}">{{ post.likes }}</span>
+            </button>
+            {% endif %}
+            <button class="btn btn-dark icon-button ps-2 pe-3 pt-2"
+                    type="submit" name="my_button" style="z-index: 500;">
+                <svg fill="#000000" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="37px"
+                     height="36px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+                    <g>
+                        <path d="M88.466,16.936c-0.172-1.703-1.592-3.036-3.34-3.036H14.781v0.009c-1.705,0.047-3.079,
+                        1.355-3.247,3.027H11.5v56.342h0.068 c0.305,1.512,1.622,2.65,3.214,2.694v0.009h11.564v6.744c0,
+                        1.864,1.51,3.374,3.374,3.374c1.165,0,2.192-0.591,2.798-1.49 l8.629-8.629h43.979c1.634,0,
+                        2.995-1.161,3.306-2.703H88.5V16.936H88.466z" fill="#dee2e6"/>
+                    </g>
+                </svg>
+                <span class="ms-2" style="font-size:16px;">{{ post.comments }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="card mt-3 mb-4 px-2 bg-body-tertiary border-0">
+    <div class="mt-2 mb-4 px-3">
+        <h2 class="card-title mt-3 mb-4 comments-blog">Комментариев: {{ post.comments }}</h2>
+        <textarea class="form-control custom-input input-blog" id="comment-input" data-post-id="{{ post.id }}"
+                  rows="3"
+                  style="height: auto; overflow-y: hidden; resize:none; padding-top: 0.65rem;
+                  padding-bottom: 0.65rem; font-size: 17px;"
+                  placeholder="Комментарий..."></textarea>
+    </div>
+    {% for comment in comments %}
+    <div class="px-3">
+        <div class="container mb-2">
+            <div class="row g-4">
+                <div class="col-md-1 d-flex justify-content-center align-items-center px-0">
+                    <img class="rounded-circle"
+                         src="{{ comment.user.avatar.url }}" width="50px" height="50px" alt="Author">
+                </div>
+                <div class="col">
+                    <div class="row mt-3 pb-0">
+                        <div>
+                            <p class="comment-info">{{ comment.user.name }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-0 pt-0">
+                        <div class="col-md-6 text-left">
+                            <span class="text-body-secondary comment-info">{{ comment.date }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="px-1 mt-1">{{ comment.content }}</p>
+    </div>
+    {% endfor %}
+</div>
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    var userName = getCookie('name');
+    $(document).ready(function() {
+        $('.like_button').click(function() {
+            var postId = $(this).data('post-id');
+            $.ajax({
+                url: "{% url 'like' %}",
+                method: 'POST',
+                data: { post_id: postId, user_name: userName },
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+                success: function(response) {
+                    if (response.message === 'created') {
+                        var likeCount = parseInt($('#like_count_' + postId).text());
+                        likeCount = likeCount + 1;
+                        $('#like_count_' + postId).text(likeCount);
+                        $('#like_count_' + postId).css('color', '#e9445a')
+                        $('#like_icon_' + postId).attr('fill', '#e9445a');
+                    }
+                    if (response.message === 'deleted') {
+                        var likeCount = parseInt($('#like_count_' + postId).text());
+                        likeCount = likeCount - 1;
+                        $('#like_count_' + postId).text(likeCount);
+                        $('#like_count_' + postId).css('color', '#dee2e6')
+                        $('#like_icon_' + postId).attr('fill', '#dee2e6');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    var button = document.getElementById('auth');
+                    button.click();
+                }
+            });
+        });
+    });
+    var commentInput = document.getElementById('comment-input');
+
+    if (commentInput) {
+        window.onload = function() {
+            element.scrollIntoView();
+        };
+    }
+    document.getElementById('comment-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            var postId = $(this).data('post-id');
+            var content = $(this).val();
+            $.ajax({
+                url: "{% url 'comment' %}",
+                method: 'POST',
+                data: { post_id: postId, user_name: userName, content: content },
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    var button = document.getElementById('auth');
+                    button.click();
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

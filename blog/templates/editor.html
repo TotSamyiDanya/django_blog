@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактор поста{% endblock %}
+
+{% block content %}
+
+<div class="card mt-3 mb-3 px-2 pb-0 border-0 bg-body-tertiary">
+    {% if mode == 'create' %}
+    <form class="col"
+          method="post" action="{% url 'create' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3 px-3 mt-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.title.id_for_label }}">Заголовок</label>
+            {{ post_form.title }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.subtitle.id_for_label }}">Подзаголовок</label>
+            {{ post_form.subtitle }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.topic.id_for_label }}">Тема</label>
+            {{ post_form.topic }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.content.id_for_label }}">Текст</label>
+            {{ post_form.content }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.cover.id_for_label }}">Обложка поста</label>
+            {{ post_form.cover }}
+        </div>
+        <div class="mb-3 px-3">
+            <img id="uploadedImage" class="card-img-top img-fluid rounded"
+                 src="" >
+        </div>
+        <div class="row mb-3 justify-content-end">
+            <button class="btn btn-dark ms-3 pt-2 pb-2 save-button"
+                    type="submit">Сохранить</button>
+        </div>
+    </form>
+    {% else %}
+    <form class="col"
+          method="post" action="{% url 'update' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="post_id" value="{{ post_id }}">
+        <div class="mb-3 px-3 mt-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.title.id_for_label }}">Заголовок</label>
+            {{ post_form.title }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.subtitle.id_for_label }}">Подзаголовок</label>
+            {{ post_form.subtitle }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.topic.id_for_label }}">Тема</label>
+            {{ post_form.topic }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.content.id_for_label }}">Текст</label>
+            {{ post_form.content }}
+        </div>
+        <div class="mb-3 px-3">
+            <label class="form-label button-blog"
+                   for="{{ post_form.cover.id_for_label }}">Обложка поста</label>
+            {{ post_form.cover }}
+        </div>
+        <div class="mb-3 px-3">
+            <img id="uploadedImage" class="card-img-top img-fluid rounded"
+                 src="{{ image }}" >
+        </div>
+        <div class="row mb-3 justify-content-end">
+            <a class="btn btn-dark ms-3 pt-2 pb-2 delete-button"
+               href="{% url 'delete' %}?post_id={{ post_id }}">Удалить</a>
+            <button class="btn btn-dark ms-3 pt-2 pb-2 save-button"
+                    type="submit">Сохранить</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+<script>
+    $(document).ready(function(){
+        $('#imageInput').change(function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#uploadedImage').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+    var imageUrl = "{{ image }}";
+    function setImageToInput(url, inputId) {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                var file = new File([blob], getFileNameFromUrl(imageUrl), {type: blob.type});
+                var input = document.getElementById(inputId);
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                input.files = dataTransfer.files;
+            })
+            .catch(error => {
+                console.error('Произошла ошибка при загрузке файла: ', error);
+            });
+    }
+    function getFileNameFromUrl(url) {
+        var matches = url.match(/\/([^\/?#]+)[^\/]*$/);
+        if (matches) {
+            return matches[1];
+        }
+        return null;
+    }
+</script>
+{% endblock %}
